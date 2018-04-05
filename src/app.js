@@ -1,73 +1,41 @@
 "use strict"
 
-import {createStore} from 'redux';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {createStore,applyMiddleware} from 'redux';
+import reducers from "./reducers/index";
+import {addToCart} from "./actions/cartAction";
+import {postBook,deleteBook,updateBook} from "./actions/booksaction";
+import logger from "redux-logger";
+import {Provider} from "react-redux"
 
-const reducer = function(state={books:[]},action){
-	switch(action.type){
-		case "book":
-    // let books = state.books.concat(action.payload);
-		return {books:[...state.books,...action.payload]}; break;
+const middleware = applyMiddleware(logger);
+const store =createStore(reducers,middleware);
+// store.subscribe(function(){
+// 	console.log("current state is", store.getState());
+// })
 
-		case "deletebook":
-		const booktodelete = [...state.books];
-		const indextodelete = booktodelete.findIndex(
-			function(book){
-				return book.id === action.payload.id ;
-			}
-		)
-		return {books:[...booktodelete.slice(0,indextodelete),...booktodelete.slice(indextodelete+1)]};
-	  break;
+import Booklist from "./components/pages/bookList";
 
-		case "updatebook":
-		const booktoupdate = [...state.books];
-		const indextoupdate = booktoupdate.findIndex(
-			function(book){
-				return book.id === action.payload.id ;
-			}
-		)
 
-const updatedbook = {...booktoupdate[indextoupdate],title:action.payload.title}
+ReactDOM.render(
+  <Provider store={store}>
+	<Booklist />
+ </Provider>
+	, document.getElementById('app'));
 
-		return {books:[...booktoupdate.slice(0,indextoupdate),updatedbook,...booktoupdate.slice(indextoupdate+1)]};
-		break;
-	}
-	return state
-}
+// store.dispatch(postBook()
+// );
 
-const store =createStore(reducer);
-
-store.subscribe(function(){
-	console.log("current state is", store.getState());
-})
-
-store.dispatch({type:"book",payload:
-[{
-	id:'1',
-	title:'first'
-},
-{
-	id:'2',
-	title:'second'
-},
-{
-	id:'3',
-	title:'third'
-},
-{
-	id:'4',
-	title:'fourth'
-}]
-});
-
-store.dispatch({type:"deletebook",payload:
-{
-	id:'2'
-}
-});
-
-store.dispatch({type:"updatebook",payload:
-{
-	id:'3',
-	title:'updated'
-}
-});
+// store.dispatch(deleteBook({
+// 	id:'2'
+// })
+// );
+//
+// store.dispatch(updateBook({
+// 	id:'3',
+// 	title:'updated'
+// })
+// );
+//
+// store.dispatch(addToCart([{id:1}]));
